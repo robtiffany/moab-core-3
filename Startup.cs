@@ -30,7 +30,7 @@ namespace MoabCore3
             services.AddControllers();
             services.AddSwaggerGen(c =>
             {
-                c.SwaggerDoc("v1", new OpenApiInfo { Title = "MoabCore3", Version = "v1" });
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "Moab Core /3", Version = "v3" });
             });
         }
 
