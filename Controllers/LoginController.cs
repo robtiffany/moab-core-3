@@ -12,32 +12,28 @@ namespace MoabCore3.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class OrganizationController : ControllerBase
+    public class LoginController : ControllerBase
     {
-        private Services.OrganizationService organizationService;
-        private readonly ILogger<OrganizationController> _logger;
+        private Services.LoginService loginService;
+        private readonly ILogger<LoginController> _logger;
 
-        //private Services.IdentityAccessService IdentityAccessService;
-
-        public OrganizationController(IConfiguration config, ILogger<OrganizationController> logger)
+        public LoginController(IConfiguration config, ILogger<LoginController> logger)
         {
             _logger = logger;
 
-            this.organizationService = new Services.OrganizationService(config, _logger);
+            this.loginService = new Services.LoginService(config, _logger);
             //this.IdentityAccessService = new Services.IdentityAccessService(config);
         }
 
         /**
-        // GET: api/<OrganizationController>
+        // GET: api/<LoginController>
         [HttpGet]
         public IEnumerable<string> Get()
         {
             return new string[] { "value1", "value2" };
         }
-        **/
 
-        /**
-        // GET api/<OrganizationController>/5
+        // GET api/<LoginController>/5
         [HttpGet("{id}")]
         public string Get(int id)
         {
@@ -45,14 +41,14 @@ namespace MoabCore3.Controllers
         }
         **/
 
-        // POST api/<OrganizationController>
-        [HttpPost("~/api/v3/Organization")]
-        public ActionResult Post([FromBody] Models.OrganizationRequest value)
+        // POST api/<LoginController>
+        [HttpPost("~/api/v3/Login")]
+        public ActionResult Post([FromBody] Models.LoginRequest value)
         {
-            var result = organizationService.Initialize(value);
+            var result = loginService.Login(value.EmailAddress, value.Password);
             if (result == null)
             {
-                return NotFound();
+                return Unauthorized();
             }
             else
             {
@@ -61,21 +57,17 @@ namespace MoabCore3.Controllers
         }
 
         /**
-        // PUT api/<OrganizationController>/5
+        // PUT api/<LoginController>/5
         [HttpPut("{id}")]
         public void Put(int id, [FromBody] string value)
         {
         }
-        **/
 
-        /**
-        // DELETE api/<OrganizationController>/5
+        // DELETE api/<LoginController>/5
         [HttpDelete("{id}")]
         public void Delete(int id)
         {
-
         }
         **/
-
     }
 }
