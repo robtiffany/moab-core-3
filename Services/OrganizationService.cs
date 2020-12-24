@@ -31,6 +31,7 @@ namespace MoabCore3.Services
             Guid group;
             Guid user;
             Guid securityToken;
+            Guid userIdGuid;
 
             try
             {
@@ -46,13 +47,16 @@ namespace MoabCore3.Services
                 }
                 else
                 {
+                    //Create a new User Id UUID
+                    userIdGuid = Guid.NewGuid();
+
                     //Create a new Organization
-                    if ((organization = CreateOrganization(value)) != errorGuid)
+                    if ((organization = CreateOrganization(value, userIdGuid)) != errorGuid)
                     {
-                        if ((group = CreateGroup(organization)) != errorGuid)
+                        if ((group = CreateGroup(organization, userIdGuid)) != errorGuid)
                         {
                             //Create a User with Creator Role priveleges within the new Organization
-                            if ((user = CreateUser(value, organization, out securityToken)) != errorGuid)
+                            if ((user = CreateUser(value, organization, userIdGuid, out securityToken)) != errorGuid)
                             {
 
                                 //Log Success
@@ -140,13 +144,13 @@ namespace MoabCore3.Services
             }
         }
 
-        private Guid CreateOrganization(Models.OrganizationRequest value)
+        private Guid CreateOrganization(Models.OrganizationRequest value, Guid userId)
         {
             try
             {
                 //SQL Statement
-                var sqlString = "INSERT INTO organizations (id, name, description) " +
-                    "VALUES (@id, @name, @description)";
+                var sqlString = "INSERT INTO organizations (id, name, description, created, created_by) " +
+                    "VALUES (@id, @name, @description, @created, @created_by)";
 
                 Guid idGuid = Guid.NewGuid();                
                 
@@ -159,6 +163,8 @@ namespace MoabCore3.Services
                         command.Parameters.AddWithValue("@id", NpgsqlTypes.NpgsqlDbType.Uuid, idGuid);
                         command.Parameters.AddWithValue("@name", NpgsqlTypes.NpgsqlDbType.Text, value.OrganizationName);
                         command.Parameters.AddWithValue("@description", NpgsqlTypes.NpgsqlDbType.Text, value.OrganizationDescription);
+                        command.Parameters.AddWithValue("@created", NpgsqlTypes.NpgsqlDbType.TimestampTz, DateTime.UtcNow);
+                        command.Parameters.AddWithValue("@created_by", NpgsqlTypes.NpgsqlDbType.Uuid, userId);
                         command.Prepare();
                         command.ExecuteNonQuery();
 
@@ -177,13 +183,13 @@ namespace MoabCore3.Services
 
 
 
-        private Guid CreateGroup(Guid organization)
+        private Guid CreateGroup(Guid organization, Guid userId)
         {
             try
             {
                 //SQL Statement
-                var sqlString = "INSERT INTO groups (id, name, description, organization, primary_group) " +
-                    "VALUES (@id, @name, @description, @organization, @primary_group)";
+                var sqlString = "INSERT INTO groups (id, name, description, organization, primary_group, created, created_by) " +
+                    "VALUES (@id, @name, @description, @organization, @primary_group, @created, @created_by)";
 
                 Guid idGuid = Guid.NewGuid();
 
@@ -198,6 +204,8 @@ namespace MoabCore3.Services
                         command.Parameters.AddWithValue("@description", NpgsqlTypes.NpgsqlDbType.Text, "Global Group");
                         command.Parameters.AddWithValue("@organization", NpgsqlTypes.NpgsqlDbType.Uuid, organization);
                         command.Parameters.AddWithValue("@primary_group", NpgsqlTypes.NpgsqlDbType.Bigint, 1);
+                        command.Parameters.AddWithValue("@created", NpgsqlTypes.NpgsqlDbType.TimestampTz, DateTime.UtcNow);
+                        command.Parameters.AddWithValue("@created_by", NpgsqlTypes.NpgsqlDbType.Uuid, userId);
                         command.Prepare();
                         command.ExecuteNonQuery();
 
@@ -216,15 +224,15 @@ namespace MoabCore3.Services
         }
 
 
-        private Guid CreateUser(Models.OrganizationRequest value, Guid organization, out Guid securityTokenOut)
+        private Guid CreateUser(Models.OrganizationRequest value, Guid organization, Guid userId, out Guid securityTokenOut)
         {
             try
             {
                 //SQL Statement
-                var sqlString = "INSERT INTO users (id, first_name, last_name, description, email_address, password, security_token, organization, primary_user, role) " +
-                    "VALUES (@id, @first_name, @last_name, @description, @email_address, @password, @security_token, @organization, @primary_user, @role)";
+                var sqlString = "INSERT INTO users (id, first_name, last_name, description, email_address, password, security_token, organization, primary_user, role, created, created_by) " +
+                    "VALUES (@id, @first_name, @last_name, @description, @email_address, @password, @security_token, @organization, @primary_user, @role, @created, @created_by)";
 
-                Guid idGuid = Guid.NewGuid();
+                //Guid idGuid = Guid.NewGuid();
                 Guid securityTokenGuid = Guid.NewGuid();
 
                 using (var connection = new NpgsqlConnection(connectionString))
@@ -233,7 +241,7 @@ namespace MoabCore3.Services
 
                     using (var command = new NpgsqlCommand(sqlString, connection))
                     {
-                        command.Parameters.AddWithValue("@id", NpgsqlTypes.NpgsqlDbType.Uuid, idGuid);
+                        command.Parameters.AddWithValue("@id", NpgsqlTypes.NpgsqlDbType.Uuid, userId);
                         command.Parameters.AddWithValue("@first_name", NpgsqlTypes.NpgsqlDbType.Text, value.FirstName);
                         command.Parameters.AddWithValue("@last_name", NpgsqlTypes.NpgsqlDbType.Text, value.LastName);
                         command.Parameters.AddWithValue("@description", NpgsqlTypes.NpgsqlDbType.Text, value.UserDescription);
@@ -243,12 +251,14 @@ namespace MoabCore3.Services
                         command.Parameters.AddWithValue("@organization", NpgsqlTypes.NpgsqlDbType.Uuid, organization);
                         command.Parameters.AddWithValue("@primary_user", NpgsqlTypes.NpgsqlDbType.Bigint, 1);
                         command.Parameters.AddWithValue("@role", NpgsqlTypes.NpgsqlDbType.Bigint, 1);
+                        command.Parameters.AddWithValue("@created", NpgsqlTypes.NpgsqlDbType.TimestampTz, DateTime.UtcNow);
+                        command.Parameters.AddWithValue("@created_by", NpgsqlTypes.NpgsqlDbType.Uuid, userId);
                         command.Prepare();
                         command.ExecuteNonQuery();
 
                         //Log Success
                         securityTokenOut = securityTokenGuid;
-                        return idGuid;
+                        return userId;
                     }
                 }
             }
