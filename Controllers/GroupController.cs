@@ -12,29 +12,27 @@ namespace MoabCore3.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class UserController : ControllerBase
+    public class GroupController : ControllerBase
     {
-        private Services.UserService userService;
-        private readonly ILogger<UserController> _logger;
+        private Services.GroupService groupService;
+        private readonly ILogger<GroupController> _logger;
         private Services.IdentityAccessService IdentityAccessService;
 
-        public UserController(IConfiguration config, ILogger<UserController> logger)
+        public GroupController(IConfiguration config, ILogger<GroupController> logger)
         {
             _logger = logger;
 
-            this.userService = new Services.UserService(config, _logger);
-            //this.IdentityAccessService = new Services.IdentityAccessService(config, _logger);
+            this.groupService = new Services.GroupService(config, _logger);
             this.IdentityAccessService = new Services.IdentityAccessService(config);
-
         }
 
-        // GET: api/<UserController>
-        [HttpGet("~/api/v3/User")]
+        // GET: api/<GroupController>
+        [HttpGet("~/api/v3/Group")]
         public ActionResult Get()
         {
             if (IdentityAccessService.IsUserAuthorized(HttpContext, out Guid organizationOut, out Guid identityOut, out long roleOut))
             {
-                var result = userService.GetAllUsers(organizationOut);
+                var result = groupService.GetAllGroups(organizationOut);
                 if (result == null)
                 {
                     return NotFound();
@@ -50,13 +48,13 @@ namespace MoabCore3.Controllers
             }
         }
 
-        // GET api/<UserController>/5
-        [HttpGet("~/api/v3/User/{id}")]
+        // GET api/<GroupController>/5
+        [HttpGet("~/api/v3/Group/{id}")]
         public ActionResult Get(Guid id)
         {
             if (IdentityAccessService.IsUserAuthorized(HttpContext, out Guid organizationOut, out Guid identityOut, out long roleOut))
             {
-                var result = userService.GetUser(id, organizationOut);
+                var result = groupService.GetGroup(id, organizationOut);
                 if (result == null)
                 {
                     return NotFound();
@@ -72,15 +70,15 @@ namespace MoabCore3.Controllers
             }
         }
 
-        // POST api/<UserController>
-        [HttpPost("~/api/v3/User")]
-        public ActionResult Post([FromBody] Models.UserRequest value)
+        // POST api/<GroupController>
+        [HttpPost("~/api/v3/Group")]
+        public ActionResult Post([FromBody] Models.GroupRequest value)
         {
             if (IdentityAccessService.IsUserAuthorized(HttpContext, out Guid organizationOut, out Guid identityOut, out long roleOut))
             {
                 if (roleOut == 1)
                 {
-                    var result = userService.CreateUser(value, organizationOut);
+                    var result = groupService.CreateGroup(value, organizationOut);
                     if (result == null)
                     {
                         return NotFound();
@@ -99,25 +97,26 @@ namespace MoabCore3.Controllers
             {
                 return Unauthorized();
             }
+
         }
 
         /**
-        // PUT api/<UserController>/5
+        // PUT api/<GroupController>/5
         [HttpPut("{id}")]
         public void Put(int id, [FromBody] string value)
         {
         }
         **/
 
-        // DELETE api/<UserController>/5
-        [HttpDelete("~/api/v3/User/{id}")]
+        // DELETE api/<GroupController>/5
+        [HttpDelete("~/api/v3/Group/{id}")]
         public ActionResult Delete(Guid id)
         {
             if (IdentityAccessService.IsUserAuthorized(HttpContext, out Guid organizationOut, out Guid identityOut, out long roleOut))
             {
                 if (roleOut == 1)
                 {
-                    var result1 = userService.DeleteUser(id, organizationOut);
+                    var result1 = groupService.DeleteGroup(id, organizationOut);
                     if (result1 == null)
                     {
                         return NotFound();
@@ -136,8 +135,7 @@ namespace MoabCore3.Controllers
             {
                 return Unauthorized();
             }
+
         }
-
-
     }
 }

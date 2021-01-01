@@ -13,13 +13,15 @@ namespace MoabCore3.Services
         //Connection String
         private readonly string connectionString;
 
-        private readonly ILogger<Controllers.UserController> _logger;
+        //private readonly ILogger<Controllers.UserController> _logger;
+        private readonly ILogger _logger = null;
         Guid errorGuid = new Guid("00000000000000000000000000000000");
 
-        public IdentityAccessService(IConfiguration config, ILogger<Controllers.UserController> logger)
+        //public IdentityAccessService(IConfiguration config, ILogger<Controllers.UserController> logger)
+        public IdentityAccessService(IConfiguration config)
         {
             connectionString = config.GetConnectionString("DefaultConnection");
-            _logger = logger;
+            //_logger = logger;
         }
 
         public bool IsEntityAuthorized(Microsoft.AspNetCore.Http.HttpContext context, out Guid organizationOut, out Guid identityOut, out Guid digitalTwinModelOut)
