@@ -2,6 +2,10 @@
 
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
+    <UserSecretsId>d148072c-4310-43da-8fb6-a747d4ce1b77</UserSecretsId>
+    <Company>The Moab Foundation</Company>
+    <Authors>Rob Tiffany</Authors>
+    <Product>Moab Core /3</Product>
   </PropertyGroup>
 
   <ItemGroup>
