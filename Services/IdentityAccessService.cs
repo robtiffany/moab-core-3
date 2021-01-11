@@ -79,7 +79,7 @@ namespace MoabCore3.Services
             try
             {
                 //SQL Statement
-                var sqlString = "SELECT COUNT(*) FROM entity_registry WHERE id = @id AND security_token = @securitytoken";
+                var sqlString = "SELECT COUNT(*) FROM digital_twins WHERE id = @id AND security_token = @securitytoken";
 
                 using (var connection = new NpgsqlConnection(connectionString))
                 {
@@ -116,7 +116,7 @@ namespace MoabCore3.Services
             try
             {
                 //SQL Statement
-                var sqlString = "SELECT organization FROM entity_registry WHERE id = @id AND security_token = @securitytoken";
+                var sqlString = "SELECT organization FROM digital_twins WHERE id = @id AND security_token = @securitytoken";
 
                 using (var connection = new NpgsqlConnection(connectionString))
                 {
@@ -145,7 +145,7 @@ namespace MoabCore3.Services
             try
             {
                 //SQL Statement
-                var sqlString = "SELECT digital_twin_model FROM entity_registry WHERE id = @id";
+                var sqlString = "SELECT digital_twin_model FROM digital_twins WHERE id = @id";
 
                 using (var connection = new NpgsqlConnection(connectionString))
                 {
