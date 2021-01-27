@@ -79,7 +79,7 @@ namespace MoabCore3.Services
             try
             {
                 //SQL Statement
-                var sqlString = "SELECT COUNT(*) FROM digital_twins WHERE id = @id AND security_token = @securitytoken";
+                var sqlString = "SELECT COUNT(*) FROM digital_twins WHERE id = @id AND security_token = @securitytoken AND enabled = 1";
 
                 using (var connection = new NpgsqlConnection(connectionString))
                 {
